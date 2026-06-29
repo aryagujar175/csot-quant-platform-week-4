@@ -11,16 +11,22 @@ build && cmake -B build && cmake --build build -j
 
 I have attached perf numbers below, but I am not sure they make sense. I strongly doubt that the program was running on 2 seperate cores on my laptop, and all the methods I tried to actually verify that were futile.
 
+ 
  Performance counter stats for './build/pipeline_runner data/large.feed':
 
-         4,178,181      cpu_atom/cache-misses/                                                  (44.37%)
-        26,437,218      cpu_core/cache-misses/                                                  (55.63%)
-             1,011      context-switches                                                      
-     6,571,117,388      cpu_atom/instructions/                                                  (44.37%)
-     9,940,838,112      cpu_core/instructions/                                                  (55.63%)
+         3,709,676      cpu_atom/cache-misses/                                                  (35.86%)
+        25,394,663      cpu_core/cache-misses/                                                  (64.14%)
+               819      context-switches                                                      
+     6,671,721,208      cpu_atom/instructions/                                                  (35.86%)
+     9,432,773,050      cpu_core/instructions/                                                  (64.14%)
 
-      14.240745290 seconds time elapsed
+       9.271997406 seconds time elapsed
 
-       2.290504000 seconds user
-       4.748826000 seconds sys
+       1.130777000 seconds user
+       3.225777000 seconds sys
 
+Things that I learnt/ surprised me:
+
+1. Using a rolling sum for calculating variance did not work. Even with recalculating the entire sum every 1024th iteration of the symbol. Decimal drift was likely too large somewhere in the hidden cases.
+2. It was really hard for me to understand what was working and what was not this week, because of the inherent inconsistency of the judge. 
+3. At first, I was really surprised by the division between the two threads: one thread will just process the tick while the other thread does most of the heavy lifting. Despite what I thought, this combination of threads significantly outperformed a single thread.
